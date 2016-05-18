@@ -4,9 +4,9 @@ var Sequelize = require('sequelize');
 var bcrypt = require('bcrypt');
 
 module.exports = function (sequelize, DataTypes) {
-    var Ingredient = sequelize.define("Ingredient",
+    var Brand = sequelize.define("Brand",
         {
-            ingredientid: {
+            brandid: {
                 type: Sequelize.INTEGER,
                 primaryKey: true, autoIncrement: true,
                 allowNull: false
@@ -23,22 +23,22 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         {
-            tableName: 'ingredients',
+            tableName: 'brands',
             timestamps: true,
             paranoid: true,
             classMethods: {
                 associate: function (models) {
-                    Ingredient.hasMany(models.ProductIngredient, {
+                    Brand.hasMany(models.Product, {
                             foreignKey: {
-                                name: 'ingredientid',
+                                name: 'brandid',
                                 allowNull: false
                             }
                         }
-                    )
+                    );
                 }
             }
         }
     );
 
-    return Ingredient;
+    return Brand;
 };

@@ -17,6 +17,11 @@ module.exports = function (sequelize, DataTypes) {
             ingredientid: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            approved: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                default: false
             }
         },
         {

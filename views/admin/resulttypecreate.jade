@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    h1 New Result Type
+    p Add a new result type for users to select when adding or updating a product.
+    form(action="/admin/resulttype" method="post")
+        .form-group
+            label(for="description") Description
+            input#description.form-control(type="text" name="description" placeholder="Description" required)
+        .form-group
+            label(for="approved") Approved
+            input#approved.checkbox(type="checkbox" name="approved")
+        .form-group
+            button.btn.btn-primary(type="submit") Save
+
+

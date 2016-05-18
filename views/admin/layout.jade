@@ -16,24 +16,30 @@ html(lang='en')
                         span.icon-bar
                         span.icon-bar
                         span.icon-bar
-                    a.navbar-brand(href='/user/dashboard') Project name
+                    a.navbar-brand(href='/admin/dashboard') Project name
                 #navbar.navbar-collapse.collapse
                     ul.nav.navbar-nav
                         li(class=(title == 'Dashboard') ? 'active' : undefined)
-                            a(href='/user/dashboard') Dashboard
+                            a(href='/admin/dashboard') Dashboard
+                        li(class=(title == 'Brands') ? 'active' : undefined)
+                            a(href='/admin/brands') Brands
                         li(class=(title == 'Products') ? 'active' : undefined)
-                            a(href='/user/products') Products
+                            a(href='/admin/products') Products
+                        li(class=(title == 'Ingredients') ? 'active' : undefined)
+                            a(href='/admin/ingredients') Ingredients
+                            li(class=(title == 'Result Type') ? 'active' : undefined)
+                                a(href='/admin/resulttypes') Result Types
                     ul.nav.navbar-nav.navbar-right
                         if( user.admin )
                             li
-                                a(href='/admin/dashboard') Admin
+                                a(href='/user/dashboard') User
                         li.dropdown
                             a.dropdown-toggle(href='#' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
                                 | #{user.email}
                                 span.caret
                             ul.dropdown-menu
                                 li
-                                    a(href='/user/account') Account
+                                    a(href='/admin/account') Account
                                 li.divider(role='separator')
                                 li
                                     a(href='/logout') Logout

@@ -55,3 +55,17 @@ exports.isAuthenticated = function (req, res, next) {
     }
     res.redirect('/login');
 };
+
+exports.isUserAuthorized = function (req, res, next) {
+    if (req.isAuthenticated() ) {
+        return next();
+    }
+    res.redirect('/login');
+};
+
+exports.isAdminAuthorized = function (req, res, next) {
+    if (req.isAuthenticated() && req.user.admin ) {
+        return next();
+    }
+    res.redirect('/login');
+};

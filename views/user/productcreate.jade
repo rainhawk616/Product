@@ -6,39 +6,18 @@ block content
     form(action="/user/product" method="post")
         .form-group
             label(for="brand") Brand
-            input#brand.form-control(type="text" name="brand" placeholder="Brand")
+            select#brand.form-control(name="brand")
+                for brand in brands
+                    option(value='#{brand.brandid}') #{brand.name}
         .form-group
             label(for="name") Name
             input#name.form-control(type="text" name="name" placeholder=" ProductName")
         .form-group
             label(for="description") Description
-            input#description.form-control(type="text" name="description" placeholder="Description")
+            textarea#description.form-control(rows=5 name="description" placeholder="Description")
         .form-group
             label Ingredients
-            ul.nav.nav-tabs
-                li.active
-                    a(href="#paste" data-toggle="tab") Paste
-                li
-                    a(href="#list" data-toggle="tab") List
-            .tab-content
-                #paste.tab-pane.active
-                    .form-group
-                        textarea#ingredientPaste.form-control(name="ingredientPaste" rows=5 placeholder="Paste your comma seperated list of ingredeints here.")
-                    .form-group
-                    a.btn.btn-info(onclick="parseIngredientPase();") Switch to list
-                #list.tab-pane
-                    .form-group.input-group.duplicate
-                        input.form-control(name="ingredients" type="text" placeholder="Ingredient")
-                        .input-group-addon.btn(onclick="removeDuplicate(this);")
-                            button.close(type="button") &times
-                    .form-group.input-group.duplicate
-                        input.form-control(name="ingredients" type="text" placeholder="Ingredient")
-                        .input-group-addon.btn(onclick="removeDuplicate(this);")
-                            button.close(type="button") &times
-                    .form-group.input-group.duplicate
-                        input.form-control(name="ingredients" type="text" placeholder="Ingredient")
-                        .input-group-addon.btn(onclick="removeDuplicate(this);")
-                            button.close(type="button") &times
+            textarea#ingredientPaste.form-control(name="ingredientPaste" rows=5 placeholder="Paste your comma seperated list of ingredeints here.")
         .form-group
             label(for="resultType") Results of using this product
             select#resultType.form-control(name="resultType")

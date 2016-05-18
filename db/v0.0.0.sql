@@ -12,3 +12,5 @@ insert into resulttypes (resulttypeid, description, good, "createdAt", "updatedA
 insert into resulttypes (resulttypeid, description, good, "createdAt", "updatedAt") values (7, 'Itchy', FALSE, now(), now());
 insert into resulttypes (resulttypeid, description, good, "createdAt", "updatedAt") values (8, 'Dry', FALSE, now(), now());
 
+insert into brands (brandid, name, "createdAt", "updatedAt") values (1,'Suave', now(), now());
+

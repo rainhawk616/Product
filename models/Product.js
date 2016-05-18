@@ -13,15 +13,21 @@ module.exports = function (sequelize, DataTypes) {
             },
             name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
+                unique: true
             },
-            brand: {
-                type: Sequelize.STRING,
-                allowNull: true
+            brandid: {
+                type: Sequelize.INTEGER,
+                allowNull: false
             },
             description: {
                 type: Sequelize.STRING,
                 allowNull: true
+            },
+            approved: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                default: false
             }
         },
         {
@@ -37,6 +43,13 @@ module.exports = function (sequelize, DataTypes) {
                             }
                         }
                     );
+                    Product.belongsTo(models.Brand, {
+                        onDelete: "CASCADE",
+                        foreignKey: {
+                            name: 'brandid',
+                            allowNull: false
+                        }
+                    });
                 }
             }
         }

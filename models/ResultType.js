@@ -12,11 +12,17 @@ module.exports = function (sequelize, DataTypes) {
             },
             description: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
+                unique: true
             },
             good: {
                 type: Sequelize.BOOLEAN,
                 allowNull: true
+            },
+            approved: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                default: false
             }
         },
         {

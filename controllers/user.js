@@ -5,11 +5,11 @@ var Promise = require("bluebird");
 
 module.exports = {
     registerRoutes: function (app, passportConfig) {
-        app.get('/user/dashboard', passportConfig.isAuthenticated, this.dashboard);
-        app.get('/user/products', passportConfig.isAuthenticated, this.products);
-        app.get('/user/product', passportConfig.isAuthenticated, this.productcreate);
-        app.post('/user/product', passportConfig.isAuthenticated, this.productcreatepost);
-        app.get('/user/product/:productid', passportConfig.isAuthenticated, this.product);
+        app.get('/user/dashboard', passportConfig.isUserAuthorized, this.dashboard);
+        app.get('/user/products', passportConfig.isUserAuthorized, this.products);
+        app.get('/user/product', passportConfig.isUserAuthorized, this.productcreate);
+        app.post('/user/product', passportConfig.isUserAuthorized, this.productcreatepost);
+        app.get('/user/product/:productid', passportConfig.isUserAuthorized, this.product);
     },
     dashboard: function (req, res, next) {
         res.render('user/dashboard', {
@@ -45,10 +45,11 @@ module.exports = {
         });
     },
     productcreate: function (req, res, next) {
-        models.ResultType.findAll().then(function (resultTypes) {
+        sequelize.Promise.all([ models.ResultType.findAll(), models.Brand.findAll()]).spread(function (resultTypes, brands) {
             res.render('user/productcreate', {
                 title: "Product",
-                resultTypes: resultTypes
+                resultTypes: resultTypes,
+                brands: brands
             });
         });
     },
@@ -56,8 +57,8 @@ module.exports = {
 
         console.log("productcreatepost:", req.body);
 
-        //req.check('name', 'Name is required').notEmpty();
-        //req.check('resultType', 'Result of using this product are required').isInt();
+        req.check('name', 'Name is required').notEmpty();
+        req.check('resultType', 'Result of using this product are required').isInt();
 
         var errors = req.validationErrors();
 
@@ -69,40 +70,25 @@ module.exports = {
         }
         else {
 
-            console.log("req.body.ingredients", req.body.ingredients);
-            console.log("req.body.ingredients.length", req.body.ingredients.length);
-            for (var index in req.body.ingredients) {
-                var name = req.body.ingredients[index];
-                console.log("ingredient[" + index + "]:", name);
-            }
-
             var ingredients = [];
             for (var index in req.body.ingredients) {
                 if (req.body.ingredients.hasOwnProperty(index)) {
-                    var name = req.body.ingredients[index];
-                    console.log("ingredient[" + index + "]:", name);
-                    var ingredient = models.Ingredient.build(
-                        {
-                            name:index
-                        }
-                    );
-                    ingredients.push(ingredient);
+                    ingredients.push(models.Ingredient.build({name: req.body.ingredients[index]}));
                 }
             }
 
-            console.log("ingredients:", JSON.stringify(ingredients));
-
-
-
             sequelize.transaction(function (transaction) {
-                return Promise.map(ingredients, function(item, index, length) {
-                    console.log("item[" + index + "}:", item.name);
-                    return models.Ingredient.create(item, {transaction: transaction});
+                return Promise.map(ingredients, function (item, index, length) {
+                    //console.log("item[" + index + "}:", item.name);
+
+                    return item.save({transaction: transaction, logging: true});
+                    //return models.Ingredient.create(item, {transaction: transaction});
                 }, {
                     concurrency: 1
                 });
             }).then(function (result) {
-                // Transaction has been committed
+                //console.log("result",result);
+                console.log("models.Product.findAll().length:", models.Product.findAll().length);
                 req.flash('success', {msg: 'Success!.'});
                 req.session.save(function () {
                     res.redirect('/user/products');
@@ -110,12 +96,21 @@ module.exports = {
             }).catch(function (err) {
                 // Transaction has been rolled back
                 // err is whatever rejected the promise chain returned to the transaction callback
-                console.log("err:", err);
+                //console.log("err:", err);
+                models.Product.findAll().success(function (all) {
+                    console.log("models.Product.findAll().length:", all.length);
+                });
+
+                models.User.findAll().success(function (all) {
+                    console.log("models.User.findAll().length:", all.length);
+                });
+
                 req.flash('errors', {msg: "An error occured while adding your product."});
                 req.session.save(function () {
                     res.redirect('/user/product');
                 });
             });
+
 
             // var ingredients = [];
             // for (var index in req.body.ingredients) {

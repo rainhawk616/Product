@@ -56,12 +56,14 @@ app.use(function (req, res, next) {
 });
 var externalController = require('./controllers/external.js');
 var userController = require('./controllers/user.js');
+var adminController = require('./controllers/admin.js');
 
 /**
  * Routes
  */
 externalController.registerRoutes(app, passportConfig);
 userController.registerRoutes(app, passportConfig);
+adminController.registerRoutes(app, passportConfig);
 
 /**
  * Exception handlers
