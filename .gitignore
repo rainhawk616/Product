@@ -1,6 +1,6 @@
+/.env
 /views/*.html
 .idea
 /constants.js
-/config/config.json
 /node_modules
 /sessions
