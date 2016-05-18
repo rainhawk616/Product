@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    h1 New Brand
+    p Add a new brand for users to select when adding or updating a product.
+    form(action="/admin/brand" method="post")
+        .form-group
+            label(for="name") Name
+            input#name.form-control(type="text" name="name" placeholder="Name" required)
+        .form-group
+            label(for="approved") Approved
+            input#approved.checkbox(type="checkbox" name="approved" checked)
+        .form-group
+            button.btn.btn-primary(type="submit") Save
+
+

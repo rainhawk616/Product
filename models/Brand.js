@@ -20,6 +20,11 @@ module.exports = function (sequelize, DataTypes) {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
                 default: false
+            },
+            userid: {
+                type: Sequelize.INTEGER,
+                allowNull: true,
+                default: null
             }
         },
         {
@@ -28,6 +33,13 @@ module.exports = function (sequelize, DataTypes) {
             paranoid: true,
             classMethods: {
                 associate: function (models) {
+                    Brand.belongsTo(models.User, {
+                        onDelete: "CASCADE",
+                        foreignKey: {
+                            name: 'userid',
+                            allowNull: false
+                        }
+                    });
                     Brand.hasMany(models.Product, {
                             foreignKey: {
                                 name: 'brandid',
@@ -35,6 +47,12 @@ module.exports = function (sequelize, DataTypes) {
                             }
                         }
                     );
+                }
+            },
+            validate: {
+                useridCheck: function() {
+                    if(this.userid !== null && this.userid !== undefined && this.approved)
+                        throw new Error("Userid can't be set if this is approved");
                 }
             }
         }

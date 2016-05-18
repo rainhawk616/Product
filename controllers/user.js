@@ -45,7 +45,10 @@ module.exports = {
         });
     },
     productcreate: function (req, res, next) {
-        sequelize.Promise.all([ models.ResultType.findAll(), models.Brand.findAll()]).spread(function (resultTypes, brands) {
+        sequelize.Promise.all([
+            models.ResultType.findAll(),
+            models.Brand.findAll()
+        ]).spread(function (resultTypes, brands) {
             res.render('user/productcreate', {
                 title: "Product",
                 resultTypes: resultTypes,

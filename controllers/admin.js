@@ -8,10 +8,13 @@ module.exports = {
         app.get('/admin/dashboard', passportConfig.isAdminAuthorized, this.dashboard);
         app.get('/admin/products', passportConfig.isAdminAuthorized, this.products);
         app.get('/admin/brands', passportConfig.isAdminAuthorized, this.brands);
+        app.get('/admin/brand', passportConfig.isAdminAuthorized, this.brandCreate);
+        app.post('/admin/brand', passportConfig.isAdminAuthorized, this.brandCreatePost);
         app.get('/admin/ingredients', passportConfig.isAdminAuthorized, this.ingredients);
         app.get('/admin/resulttypes', passportConfig.isAdminAuthorized, this.resulttypes);
         app.get('/admin/resulttype', passportConfig.isAdminAuthorized, this.resultTypeCreate);
         app.post('/admin/resulttype', passportConfig.isAdminAuthorized, this.resultTypeCreatePost);
+
     },
     dashboard: function (req, res, next) {
         res.render('admin/dashboard', {
@@ -60,7 +63,6 @@ module.exports = {
         });
     },
     resultTypeCreate: function (req, res, next) {
-        console.log(req.body);
         res.render('admin/resulttypecreate', {
             title: "Result Type"
         });
@@ -80,17 +82,53 @@ module.exports = {
         else {
             models.ResultType.create({
                 description: req.body.description,
-                approved: req.body.approved
+                approved: req.body.approved || false
             }).then(function (resultType) {
                 req.flash('success', {msg: resultType.description + ' successfully created!'});
                 req.session.save(function () {
                     res.redirect('/admin/resulttypes');
                 });
             }).catch(function (err) {
-                req.flash('errors', {msg: 'An error occured while creating' + resultType.description});
+                console.log("err:", err);
+                req.flash('errors', {msg: 'An error occured while creating a new Result Type'});
                 req.session.save(function () {
-                    res.body(req.body);
                     res.redirect('/admin/resulttype');
+                });
+            });
+        }
+    },
+    brandCreate: function (req, res, next) {
+        res.render('admin/brandcreate', {
+            title: "Brand"
+        });
+    },
+    brandCreatePost: function (req, res, next) {
+        console.log(req.body);
+        req.check('name', 'Name is required').notEmpty();
+        req.sanitize('approved').toBoolean();
+
+        var errors = req.validationErrors();
+
+        if (errors) {
+            req.flash('errors', errors);
+            req.session.save(function () {
+                return res.redirect('/admin/brand');
+            });
+        }
+        else {
+            models.Brand.create({
+                name: req.body.name,
+                approved: req.body.approved || false
+            }).then(function (brand) {
+                req.flash('success', {msg: brand.name + ' successfully created!'});
+                req.session.save(function () {
+                    res.redirect('/admin/brands');
+                });
+            }).catch(function (err) {
+                console.log("err:", err);
+                req.flash('errors', {msg: 'An error occured while creating a new Brand'});
+                req.session.save(function () {
+                    res.redirect('/admin/brand');
                 });
             });
         }
