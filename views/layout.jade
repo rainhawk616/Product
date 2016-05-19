@@ -18,7 +18,7 @@ html(lang='en')
                         span.icon-bar
                         span.icon-bar
                         span.icon-bar
-                    a.navbar-brand(href='/') Project name
+                    a.navbar-brand(href='/') Contradistinction
                 #navbar.navbar-collapse.collapse
                     ul.nav.navbar-nav
                         li(class=(title == 'Index') ? 'active' : undefined)
@@ -33,9 +33,11 @@ html(lang='en')
                         li(class=(title == 'Sign Up') ? 'active' : undefined)
                             a(href='/signup') Sign Up
         .container
-            div.row
-                include partials/flash
-            div.row
-                block content
+            .row
+                .col-xs-10.col-xs-offset-1
+                    div.row
+                        include partials/flash
+                    div.row
+                        block content
 
         include partials/footer

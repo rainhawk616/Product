@@ -61,7 +61,13 @@ module.exports = {
         console.log("productcreatepost:", req.body);
 
         req.check('name', 'Name is required').notEmpty();
-        req.check('result', 'Results of using this product are required').isInt();
+        if (req.body.newBrand) {
+            req.check('newBrand', 'New brand name is required').notEmpty();
+        }
+        else {
+            req.check('brand', 'Brand is required').isInt();
+        }
+        req.check('ingredients', 'Ingredients are required').notEmpty();
 
         var errors = req.validationErrors();
 
@@ -73,261 +79,132 @@ module.exports = {
         }
         else {
 
-            var ingredients = [];
-            for (var index in req.body.ingredients) {
-                if (req.body.ingredients.hasOwnProperty(index)) {
-                    ingredients.push(models.Ingredient.build({name: req.body.ingredients[index]}));
+            var used = req.body.used === 'on';
+            var good = req.body.good === 'true' ? true : req.body.good === 'false' ? false : null;
+            var normalizedIngredients = [];
+            var ingredientsPaste = req.body.ingredients.split(",");
+            for (var i = 0; i < ingredientsPaste.length; i++) {
+                var name = ingredientsPaste[i].trim();
+                if (name !== '') {
+                    normalizedIngredients.push(name);
+                    console.log("ingredient:", name);
                 }
             }
 
-            sequelize.transaction(function (transaction) {
-                return Promise.map(ingredients, function (item, index, length) {
-                    //console.log("item[" + index + "}:", item.name);
+            var _ingredients = [];
+            var _brand;
+            var _product;
+            var _productIngredients;
 
-                    return item.save({transaction: transaction, logging: true});
-                    //return models.Ingredient.create(item, {transaction: transaction});
+            sequelize.transaction(function (transaction) {
+                return Promise.map(normalizedIngredients, function (item, index, length) {
+                    return models.Ingredient.findOrCreate({
+                        where: {
+                            name: item,
+                            approved: false
+                        },
+                        transaction: transaction
+                    });
                 }, {
                     concurrency: 1
-                });
+                }).then(function (ingredientFindOrCreateResponse) {
+                    for (var i = 0; i < ingredientFindOrCreateResponse.length; i++) {
+                        var ingredient = ingredientFindOrCreateResponse[i][0];
+                        var created = ingredientFindOrCreateResponse[i][1];
+                        _ingredients.push(ingredient);
+                    }
+
+                    for (var i = 0; i < _ingredients.length; i++) {
+                        console.log("_ingredients[" + i + "].ingredientid:", _ingredients[i].ingredientid);
+                    }
+
+                    if (req.body.newBrand) {
+                        return models.Brand.findOrCreate({
+                            where: {
+                                name: req.body.newBrand,
+                                approved: false
+                            },
+                            transaction: transaction
+                        });
+                    }
+                    else {
+                        return models.Brand.findById(req.body.brand, {
+                            transaction: transaction
+                        });
+                    }
+                }).then(function (brand) {
+                    console.log("brand:", brand);
+                    console.log("brand:", JSON.stringify(brand));
+                    if (brand.length)
+                        _brand = brand[0];
+                    else
+                        _brand = brand;
+
+                    console.log("_brand.brandid:", _brand.brandid);
+
+                    var newProduct = models.Product.build({
+                        name: req.body.name,
+                        description: req.body.description,
+                        approved: false
+                    });
+
+                    newProduct.setBrand(_brand, {save: false});
+
+                    return newProduct.save({transaction: transaction});
+                }).then(function (product) {
+                    _product = product;
+
+                    console.log("product.productid:", product.productid);
+
+                    return Promise.map(_ingredients, function (ingredient, index, length) {
+                        var productIngredient = models.ProductIngredient.build({});
+
+                        productIngredient.setProduct(_product, {save: false});
+                        productIngredient.setIngredient(ingredient, {save: false});
+
+                        return productIngredient.save({transaction: transaction});
+                    }, {
+                        concurrency: 1
+                    });
+                }).then(function (productIngredients) {
+                    _productIngredients = productIngredients;
+
+                    console.log("productIngredients:", JSON.stringify(productIngredients));
+
+                    for (var i = 0; i < _productIngredients.length; i++) {
+                        console.log("_productIngredients[" + i + "].productingredientid:", _productIngredients[i].productingredientid);
+                    }
+
+                    var userProduct = models.UserProduct.build({
+                        used: used,
+                        good: good
+                    });
+
+                    userProduct.setUser(req.user, {save: false});
+                    userProduct.setProduct(_product, {save: false});
+
+                    return userProduct.save({transaction: transaction});
+                }).then(function (userProduct) {
+                    _userProduct = userProduct;
+
+                    console.log("_userProduct.userproductid:", _userProduct.userproductid);
+                })
             }).then(function (result) {
-                //console.log("result",result);
-                console.log("models.Product.findAll().length:", models.Product.findAll().length);
-                req.flash('success', {msg: 'Success!.'});
+                req.flash('success', {msg: 'Success!'});
                 req.session.save(function () {
                     res.redirect('/user/products');
                 });
             }).catch(function (err) {
                 // Transaction has been rolled back
                 // err is whatever rejected the promise chain returned to the transaction callback
-                //console.log("err:", err);
-                models.Product.findAll().success(function (all) {
-                    console.log("models.Product.findAll().length:", all.length);
-                });
 
-                models.User.findAll().success(function (all) {
-                    console.log("models.User.findAll().length:", all.length);
-                });
+                console.log("err:", err);
 
                 req.flash('errors', {msg: "An error occured while adding your product."});
                 req.session.save(function () {
                     res.redirect('/user/product');
                 });
             });
-
-
-            // var ingredients = [];
-            // for (var index in req.body.ingredients) {
-            //     if (req.body.ingredients.hasOwnProperty(index)) {
-            //         ingredients.push(models.Ingredient.build(
-            //             {
-            //                 name: req.body.ingredients[index]
-            //             }
-            //         ));
-            //     }
-            // }
-            //
-            // var productIngredients = [];
-            // for (var index in ingredients) {
-            //     if (ingredients.hasOwnProperty(index)) {
-            //         var productIngredient = models.ProductIngredient.build();
-            //         productIngredient.setIngredient(ingredients[index]);
-            //         productIngredients.push(productIngredient);
-            //     }
-            // }
-            //
-            // var product = models.Product.build({
-            //     name: req.body.name,
-            //     brand: req.body.brand,
-            //     description: req.body.description
-            // });
-            // product.setProductIngredients(productIngredients);
-            //
-            // var userProductResultTypes = [models.UserProductResultType.build({resulttypeid: 1})];
-            //
-            // var userProduct = models.UserProduct.build();
-            // userProduct.setUser(req.user);
-            // userProduct.setProduct(product);
-            //
-            // for( var memeber in userProduct ) {
-            //     console.log("userProduct.",memeber);
-            // }
-            //
-            // userProduct.setUserProductResultTypes(userProductResultTypes);
-            //
-            //
-            // userProduct.save().then(function (userProduct) {
-            //     req.flash('success', {msg: 'Success!.'});
-            //     req.session.save(function () {
-            //         res.redirect('/user/products');
-            //     });
-            // }).catch(function (error) {
-            //     req.flash('errors', {msg: 'An error occured while adding your product.'});
-            //     req.session.save(function () {
-            //         res.redirect('/user/product');
-            //     });
-            // })
-
-//             return sequelize.transaction(function (transaction) {
-//                 // chain all your queries here. make sure you return them.
-//
-//                 var _product;
-//                 var _ingredients = [];
-//                 var _userProduct;
-//                 var _userProductResultType;
-//
-//                 var product = {
-//
-//                 };
-//
-//
-//                 var userProduct = {};
-//
-//                 var userProductResultType = {
-//                     resulttypeid: req.body.resultType
-//                 };
-//
-//
-//                 return models.Product.create(product, {transaction: transaction})
-//                     .then(function (product) {
-//                         _product = product;
-//
-//                         var ingredients = [];
-//
-//                         for (var index in req.body.ingredients) {
-//                             if( req.body.ingredients.hasOwnProperty(index) )
-//                                 ingredients.add(
-//                                     {
-//                                         name: req.body.ingredients[index]
-//                                     }
-//                                 );
-//                         }
-//
-//                         return Promise.map(ingredients, function(item, index, length) {
-//                             return models.Ingredient.create(item);
-//                         }, {
-//                             concurrency: 1
-//                         });
-//                     }).then(function (ingredients) {
-//                         _ingredients = ingredients;
-//
-//                         var productIngredient = models.ProductIngredient.build();
-//                         productIngredient.setIngredients(_ingredients);
-//                         productIngredient.setProduct(_product);
-//
-//                         return productIngredient.save();
-//                     })
-//
-//                 return Promise.all([group, users]);
-//
-//
-//                 User
-//                     .sync({force: true})
-//                     .then(function () {
-//
-//                     })
-//                     .spread(function (group, users) {
-//                         return group.setUsers(users)
-//                     })
-//                     .then(function (result) {
-//                         console.log(result)
-//                     })
-//             })
-//
-//             return;
-//
-//             return models.Product.create(
-//                 {
-//                     name: req.body.name,
-//                     brand: req.body.brand,
-//                     description: req.body.description,
-//                 },
-//                 {transaction: transaction}
-//             ).then(function (product) {
-//                 _product = product;
-//
-//                 return models.Ingredient.create({
-//                         name: req.body.name,
-//                         brand: req.body.brand,
-//                         description: req.body.description,
-//                     },
-//                     {transaction: transaction}
-//                 );
-//             }).then(function (ingredients) {
-//                 _ingredients = ingredients;
-//             })
-//
-//
-//             var chainer = new Sequelize.Utils.QueryChainer();
-//
-//             chainer.add(;
-//
-//             for (var index in req.body.ingredients) {
-//                 chainer.add(models.Ingredient.create(
-//                     {name: req.body.ingredients[index]},
-//                     {transaction: transaction}
-//                 ));
-//             }
-//
-//             chainer.runSerially()
-//                 .success(function (results) {
-//                     var product = results[0];
-//                     var ingredients = results.subarray(1);
-//
-//                     var chainer2 = new Sequelize.Utils.QueryChainer();
-//
-//                     chainer2.add(models.UserProduct.create(
-//                         {
-//                             userid: req.user.userid,
-//                             productid: product.productid,
-//                             resulttypeid: req.body.resulttypeid
-//                         },
-//                         {transaction: transaction}
-//                     ));
-//
-//                     for (var index in ingredients) {
-//                         chainer2.add(models.ProductIngredient.create(
-//                             {
-//                                 productid: product.productid,
-//                                 ingredientid: ingredients[index].ingredientid
-//                             },
-//                             {transaction: transaction}
-//                         ));
-//                     }
-//
-//                     chainer.runSerially()
-//                         .success(function () {
-//                             console.log("success1");
-//                             //TODO hmmm?
-//                         })
-//                         .error(function (err) {
-//                             console.log("error1");
-//                             //TODO uh... error?
-//                         });
-//                 })
-//                 .error(function (err) {
-//                     console.log("error2");
-//                     //TODO uh... error?
-//                 });
-//         }
-//         ).then(function (result) {
-//         console.log("success2");
-//         // Transaction has been committed
-//         // result is whatever the result of the promise chain returned to the transaction callback
-//         req.flash('success', {msg: 'Success!.'});
-//         req.session.save(function () {
-//             res.redirect('/user/products');
-//         });
-//     }).catch(function (err) {
-//         console.log("error3", err);
-//         // Transaction has been rolled back
-//         // err is whatever rejected the promise chain returned to the transaction callback
-//         req.flash('errors', {msg: 'An error occured while adding your product.'});
-//         req.session.save(function () {
-//             res.redirect('/user/product');
-//         });
-//     });
-// }
-// }
         }
     }
-}
+};

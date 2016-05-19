@@ -20,8 +20,8 @@ module.exports = function (sequelize, DataTypes) {
             },
             used: {
                 type: Sequelize.BOOLEAN,
-                allowNull: true,
-                default: null
+                allowNull: false,
+                default: false
             },
             good: {
                 type: Sequelize.BOOLEAN,

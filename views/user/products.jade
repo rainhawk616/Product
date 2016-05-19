@@ -8,13 +8,27 @@ block content
                 tr
                     th Product
                     th Description
-                    th Result
+                    th Tried it
+                    th Results
+                    th
             tbody
                 each userProduct in userProducts
-                    tr(class=userProduct.UserProductResult.Result.good === null? '':(userProduct.Result? 'success' : 'danger'))
+                    tr(class=userProduct.good===true?'success':userProduct.good===false?'danger':'')
                         td #{userProduct.Product.name}
                         td #{userProduct.Product.description}
-                        td #{userProduct.UserProductResult.Result.description}
+                        td
+                            if userProduct.used === true
+                                .glyphicon.glyphicon-ok
+                            else
+                                .glyphicon.glyphicon-remove
+                        td
+                            if userProduct.good === true
+                                .glyphicon.glyphicon-thumbs-up
+                            else if userProduct.good === false
+                                .glyphicon.glyphicon-thumbs-down
+                        td
+                            a.btn.btn-primary(href="../user/product/#{userProduct.userproductid}")
+                                .glyphicon.glyphicon-edit
     else
         p Looks like you haven't added any products yet.
 

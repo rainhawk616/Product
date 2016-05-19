@@ -8,7 +8,8 @@ module.exports = function (sequelize, DataTypes) {
         {
             brandid: {
                 type: Sequelize.INTEGER,
-                primaryKey: true, autoIncrement: true,
+                primaryKey: true,
+                autoIncrement: true,
                 allowNull: false
             },
             name: {

@@ -19,7 +19,7 @@ html(lang='en')
                         span.icon-bar
                         span.icon-bar
                         span.icon-bar
-                    a.navbar-brand(href='/admin/dashboard') Project name
+                    a.navbar-brand(href='/admin/dashboard') Contradistinction
                 #navbar.navbar-collapse.collapse
                     ul.nav.navbar-nav
                         li(class=(title == 'Dashboard') ? 'active' : undefined)
@@ -48,8 +48,10 @@ html(lang='en')
                                     a(href='/logout') Logout
         .container
             .row
-                include ../partials/flash
-            .row
-                block content
+                .col-xs-10.col-xs-offset-1
+                    .row
+                        include ../partials/flash
+                    .row
+                        block content
 
         include ../partials/footer
