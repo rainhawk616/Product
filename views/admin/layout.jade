@@ -7,6 +7,9 @@ html(lang='en')
         title= title
         link(rel='stylesheet' href='/bootstrap-3.3.6-dist/css/bootstrap.css')
         link(rel='stylesheet' href='/stylesheets/style.css')
+        script(src='/javascript/lib/jquery-1.12.3.js')
+        script(src='/bootstrap-3.3.6-dist/js/bootstrap.min.js')
+        script(src='/javascript/custom.js')
     body
         nav.navbar.navbar-default.navbar-static-top
             .container
@@ -28,7 +31,7 @@ html(lang='en')
                         li(class=(title == 'Ingredients') ? 'active' : undefined)
                             a(href='/admin/ingredients') Ingredients
                             li(class=(title == 'Result Type') ? 'active' : undefined)
-                                a(href='/admin/resulttypes') Result Types
+                                a(href='/admin/results') Results
                     ul.nav.navbar-nav.navbar-right
                         if( user.admin )
                             li
@@ -50,7 +53,3 @@ html(lang='en')
                 block content
 
         include ../partials/footer
-
-        script(src='/javascript/lib/jquery-1.12.3.js')
-        script(src='/bootstrap-3.3.6-dist/js/bootstrap.min.js')
-        script(src='/javascript/custom.js')
