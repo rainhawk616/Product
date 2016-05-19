@@ -15,18 +15,10 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 unique: true
             },
-            good: {
-                type: Sequelize.BOOLEAN,
-                allowNull: true
-            },
             approved: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
                 default: false
-            },
-            userid: {
-                type: Sequelize.INTEGER,
-                allowNull: true
             }
         },
         {

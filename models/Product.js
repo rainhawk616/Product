@@ -28,10 +28,6 @@ module.exports = function (sequelize, DataTypes) {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
                 default: false
-            },
-            userid: {
-                type: Sequelize.INTEGER,
-                allowNull: true
             }
         },
         {
@@ -40,13 +36,6 @@ module.exports = function (sequelize, DataTypes) {
             paranoid: true,
             classMethods: {
                 associate: function (models) {
-                    Product.belongsTo(models.User, {
-                        onDelete: "CASCADE",
-                        foreignKey: {
-                            name: 'userid',
-                            allowNull: false
-                        }
-                    });
                     Product.hasMany(models.ProductIngredient, {
                             foreignKey: {
                                 name: 'productid',
@@ -61,12 +50,6 @@ module.exports = function (sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
-                }
-            },
-            validate: {
-                useridCheck: function() {
-                    if(this.userid !== null && this.userid !== undefined && this.approved)
-                        throw new Error("Userid can't be set if this is approved");
                 }
             }
         }

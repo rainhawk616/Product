@@ -17,6 +17,16 @@ module.exports = function (sequelize, DataTypes) {
             productid: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            used: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                default: null
+            },
+            good: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                default: null
             }
         },
         {

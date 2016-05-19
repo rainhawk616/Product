@@ -12,16 +12,13 @@ module.exports = function (sequelize, DataTypes) {
             },
             productid: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
+                required: true
             },
             ingredientid: {
                 type: Sequelize.INTEGER,
-                allowNull: false
-            },
-            approved: {
-                type: Sequelize.BOOLEAN,
                 allowNull: false,
-                default: false
+                required: true
             }
         },
         {
