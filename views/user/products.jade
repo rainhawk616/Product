@@ -11,10 +11,10 @@ block content
                     th Result
             tbody
                 each userProduct in userProducts
-                    tr(class=userProduct.UserProductResultType.ResultType.good === null? '':(userProduct.ResultType? 'success' : 'danger'))
+                    tr(class=userProduct.UserProductResult.Result.good === null? '':(userProduct.Result? 'success' : 'danger'))
                         td #{userProduct.Product.name}
                         td #{userProduct.Product.description}
-                        td #{userProduct.UserProductResultType.ResultType.description}
+                        td #{userProduct.UserProductResult.Result.description}
     else
         p Looks like you haven't added any products yet.
 

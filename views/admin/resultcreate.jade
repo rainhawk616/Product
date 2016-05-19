@@ -3,7 +3,7 @@ extends layout
 block content
     h1 New Result Type
     p Add a new result type for users to select when adding or updating a product.
-    form(action="/admin/resulttype" method="post")
+    form(action="/admin/result" method="post")
         .form-group
             label(for="description") Description
             input#description.form-control(type="text" name="description" placeholder="Description" required)

@@ -11,9 +11,9 @@ module.exports = {
         app.get('/admin/brand', passportConfig.isAdminAuthorized, this.brandCreate);
         app.post('/admin/brand', passportConfig.isAdminAuthorized, this.brandCreatePost);
         app.get('/admin/ingredients', passportConfig.isAdminAuthorized, this.ingredients);
-        app.get('/admin/resulttypes', passportConfig.isAdminAuthorized, this.resulttypes);
-        app.get('/admin/resulttype', passportConfig.isAdminAuthorized, this.resultTypeCreate);
-        app.post('/admin/resulttype', passportConfig.isAdminAuthorized, this.resultTypeCreatePost);
+        app.get('/admin/results', passportConfig.isAdminAuthorized, this.results);
+        app.get('/admin/result', passportConfig.isAdminAuthorized, this.resultCreate);
+        app.post('/admin/result', passportConfig.isAdminAuthorized, this.resultCreatePost);
 
     },
     dashboard: function (req, res, next) {
@@ -52,22 +52,22 @@ module.exports = {
             });
         });
     },
-    resulttypes: function (req, res, next) {
-        models.ResultType.findAll({
+    results: function (req, res, next) {
+        models.Result.findAll({
             order: [['description', 'DESC']]
-        }).then(function (resultTypes) {
-            res.render('admin/resultTypes', {
-                title: 'Result Types',
-                resultTypes: resultTypes
+        }).then(function (results) {
+            res.render('admin/results', {
+                title: 'Results',
+                results: results
             });
         });
     },
-    resultTypeCreate: function (req, res, next) {
-        res.render('admin/resulttypecreate', {
+    resultCreate: function (req, res, next) {
+        res.render('admin/resultcreate', {
             title: "Result Type"
         });
     },
-    resultTypeCreatePost: function (req, res, next) {
+    resultCreatePost: function (req, res, next) {
         req.check('description', 'Description is required').notEmpty();
         req.sanitize('approved').toBoolean();
 
@@ -76,23 +76,23 @@ module.exports = {
         if (errors) {
             req.flash('errors', errors);
             req.session.save(function () {
-                return res.redirect('/admin/resulttype');
+                return res.redirect('/admin/result');
             });
         }
         else {
-            models.ResultType.create({
+            models.Result.create({
                 description: req.body.description,
                 approved: req.body.approved || false
-            }).then(function (resultType) {
-                req.flash('success', {msg: resultType.description + ' successfully created!'});
+            }).then(function (result) {
+                req.flash('success', {msg: result.description + ' successfully created!'});
                 req.session.save(function () {
-                    res.redirect('/admin/resulttypes');
+                    res.redirect('/admin/results');
                 });
             }).catch(function (err) {
                 console.log("err:", err);
                 req.flash('errors', {msg: 'An error occured while creating a new Result Type'});
                 req.session.save(function () {
-                    res.redirect('/admin/resulttype');
+                    res.redirect('/admin/result');
                 });
             });
         }

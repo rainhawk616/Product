@@ -6,24 +6,52 @@ block content
     form(action="/user/product" method="post")
         .form-group
             label(for="brand") Brand
-            select#brand.form-control(name="brand")
+            select#brand.form-control(name="brand" required)
+                option
                 for brand in brands
                     option(value='#{brand.brandid}') #{brand.name}
+                option Other
+        .form-group
+            input#newbrand.form-control.hidden(name="newBrand" placeholder="New Brand" required disabled)
         .form-group
             label(for="name") Name
-            input#name.form-control(type="text" name="name" placeholder=" ProductName")
+            input#name.form-control(type="text" name="name" placeholder="Name" required)
         .form-group
             label(for="description") Description
-            textarea#description.form-control(rows=5 name="description" placeholder="Description")
+            textarea#description.form-control(rows=3 name="description" placeholder="Description")
         .form-group
             label Ingredients
-            textarea#ingredientPaste.form-control(name="ingredientPaste" rows=5 placeholder="Paste your comma seperated list of ingredeints here.")
+            textarea#ingredientPaste.form-control(name="ingredientPaste" rows=3 placeholder="Paste your comma separated list of ingredients here." required)
         .form-group
-            label(for="resultType") Results of using this product
-            select#resultType.form-control(name="resultType")
-                for resultType in resultTypes
-                    option(value='#{resultType.resulttypeid}') #{resultType.description}
+            label(for="result") Results of using this product
+            select#result.form-control(name="result" required)
+                option
+                for result in results
+                    option(value='#{result.resultid}') #{result.description}
+                option Other
+        .form-group
+            input#newResult.form-control.hidden(name="newResult" placeholder="New Result" required disabled)
         .form-group
             button.btn.btn-primary(type="submit") Save
+        script(type='text/javascript').
+            $(document).ready(function () {
+                $('#brand').change(function (element) {
+                    if (this.selectedIndex == this.length - 1) {
+                        $('#newbrand').prop('disabled', false).show();
+                    }
+                    else {
+                        $('#newbrand').hide().prop('disabled', true);
+                    }
+                });
+
+                $('#result').change(function (element) {
+                    if (this.selectedIndex == this.length - 1) {
+                        $('#newResult').prop('disabled', false).show();
+                    }
+                    else {
+                    $('#newResult').hide().prop('disabled', true);
+                    }
+                });
+            });
 
 

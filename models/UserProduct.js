@@ -49,9 +49,9 @@ module.exports = function (sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
-                    UserProduct.hasMany(models.UserProductResultType, {
+                    UserProduct.hasMany(models.UserProductResult, {
                             foreignKey: {
-                                name: 'userproductresulttypeid',
+                                name: 'userproductresultid',
                                 allowNull: false
                             }
                         }

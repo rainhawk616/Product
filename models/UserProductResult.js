@@ -3,8 +3,8 @@
 var Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
-    var UserProductResultType = sequelize.define("UserProductResultType", {
-            userproductresulttypeid: {
+    var UserProductResult = sequelize.define("UserProductResult", {
+            userproductresultid: {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
@@ -14,28 +14,28 @@ module.exports = function (sequelize, DataTypes) {
                 type: Sequelize.INTEGER,
                 allowNull: false
             },
-            resulttypeid: {
+            resultid: {
                 type: Sequelize.INTEGER,
                 allowNull: false
             }
         },
         {
-            tableName: 'userproductresulttypes',
+            tableName: 'userproductresults',
             timestamps: true,
             paranoid: true,
             classMethods: {
                 associate: function (models) {
-                    UserProductResultType.belongsTo(models.UserProduct, {
+                    UserProductResult.belongsTo(models.UserProduct, {
                         onDelete: "CASCADE",
                         foreignKey: {
                             name: 'userproductid',
                             allowNull: false
                         }
                     });
-                    UserProductResultType.belongsTo(models.ResultType, {
+                    UserProductResult.belongsTo(models.Result, {
                         onDelete: "CASCADE",
                         foreignKey: {
-                            name: 'resulttypeid',
+                            name: 'resultid',
                             allowNull: false
                         }
                     });
@@ -44,5 +44,5 @@ module.exports = function (sequelize, DataTypes) {
         }
     );
 
-    return UserProductResultType;
+    return UserProductResult;
 };

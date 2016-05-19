@@ -20,8 +20,8 @@ module.exports = {
         models.UserProduct.findAll({
             include: [
                 {
-                    model: models.UserProductResultType,
-                    include: [models.ResultType]
+                    model: models.UserProductResult,
+                    include: [models.Result]
                 },
                 models.Product
             ],
@@ -46,12 +46,12 @@ module.exports = {
     },
     productcreate: function (req, res, next) {
         sequelize.Promise.all([
-            models.ResultType.findAll(),
+            models.Result.findAll(),
             models.Brand.findAll()
-        ]).spread(function (resultTypes, brands) {
+        ]).spread(function (results, brands) {
             res.render('user/productcreate', {
                 title: "Product",
-                resultTypes: resultTypes,
+                results: results,
                 brands: brands
             });
         });
@@ -61,7 +61,7 @@ module.exports = {
         console.log("productcreatepost:", req.body);
 
         req.check('name', 'Name is required').notEmpty();
-        req.check('resultType', 'Result of using this product are required').isInt();
+        req.check('result', 'Results of using this product are required').isInt();
 
         var errors = req.validationErrors();
 
